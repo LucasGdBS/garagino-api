@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from routes.route import router
+from routes.project_route import router as project_router
+from routes.user_route import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Garagino API", description="API do Garagino web app", version="1.0.0")
@@ -16,4 +17,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+app.include_router(project_router, tags=['Project'])
+app.include_router(user_router, tags=['User'])
