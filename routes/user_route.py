@@ -33,7 +33,7 @@ async def register(user: User):
                 status_code=status.HTTP_201_CREATED
             )
     except Exception as e:
-        raise HTTPException(
+        return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
@@ -42,18 +42,17 @@ async def register(user: User):
 async def login(user: UserAuth):
     '''Metodo responsavel por autenticar um usuario'''
     user_db = collection_name.find_one({'username': user.username})
-    print(user_db)
     user_db = to_dict(user_db)
-    print(user_db)
+    
 
     if user_db is None:
-        raise HTTPException(
+        return HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Email ou Senha incorretos'
         )
     
     if not crypt_context.verify(user.password, user_db['password']):
-        raise HTTPException(
+        return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Email ou senha invalido'
         )
@@ -67,7 +66,18 @@ async def login(user: UserAuth):
         'sub': user.username
     }
 
-    return {'token': jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM), 'username': user_db['username']}
+    token = {'token': jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM), 'username': user_db['username']}
+
+    response = JSONResponse(content={'Message': 'Login Realizado com sucesso'})
+    response.set_cookie(
+        key='access_token',
+        value=f'Bearer {token["token"]}',
+        httponly=True,
+        secure=True,
+        samesite='Strict',
+    )
+
+    return response
 
 
 
