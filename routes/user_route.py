@@ -72,9 +72,10 @@ async def login(user: UserAuth):
     response.set_cookie(
         key='access_token',
         value=f'Bearer {token["token"]}',
+        max_age=86400,
         httponly=True,
         secure=True,
-        samesite='Strict',
+        samesite='lax',
     )
 
     return response
