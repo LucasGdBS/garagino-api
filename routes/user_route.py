@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 from models.users import User, UserAuth
 from config.database import db

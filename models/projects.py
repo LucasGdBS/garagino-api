@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from pydantic.fields import Field
 
 class Creator(BaseModel):

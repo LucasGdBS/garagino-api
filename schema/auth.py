@@ -1,5 +1,6 @@
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Security, status
 from decouple import config
 
 SECRET_KEY = config('SECRET_KEY')
@@ -20,3 +21,8 @@ def verify_token(token):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Invalid Token'
         )
+
+def auth_wrapper(auth: HTTPAuthorizationCredentials = Security(HTTPBearer())):
+    '''Metodo responsavel por ler o token passado como parametro no header das requisições é válido
+    Deve ser passado como Depends para os endpoints que precisam de autenticação'''
+    return verify_token(auth.credentials)

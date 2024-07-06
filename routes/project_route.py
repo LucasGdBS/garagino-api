@@ -5,6 +5,7 @@ import gridfs
 from schema.schemas import project_list_serial, to_dict
 from config.database import db
 from models.projects import Project
+from schema.auth import auth_wrapper
 
 collection_name = db["garagino_projects_collection"]
 
@@ -25,7 +26,7 @@ async def get_projects():
     return JSONResponse(status_code=status.HTTP_200_OK, content=projects)
 
 # Post request to add a project
-@router.post("/projects")
+@router.post("/projects", dependencies=[Depends(auth_wrapper)])
 async def add_project(project: Project = Depends(Project), file: UploadFile = File(...)):
     try:
         file_id = fs.put(file.file, filename=file.filename)
@@ -52,7 +53,7 @@ async def get_image(file_id: str):
         raise HTTPException(status_code=500, detail="Erro ao obter imagem")
 
 # Delete request to delete a project
-@router.delete("/projects/{id}")
+@router.delete("/projects/{id}", dependencies=[Depends(auth_wrapper)])
 async def delete_project(id: str):
     collection_name.delete_one({"_id": ObjectId(id)})
     return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Project deleted successfully"})
