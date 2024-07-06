@@ -3,8 +3,12 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from bson import ObjectId
 import gridfs
 from schema.schemas import project_list_serial, to_dict
-from config.database import collection_name, fs
+from config.database import db
 from models.projects import Project
+
+collection_name = db["garagino_projects_collection"]
+
+fs = gridfs.GridFS(db)
 
 
 router = APIRouter()
