@@ -46,13 +46,13 @@ async def login(user: UserAuth):
     
 
     if user_db is None:
-        return HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Email ou Senha incorretos'
         )
     
     if not crypt_context.verify(user.password, user_db['password']):
-        return HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Email ou senha invalido'
         )
@@ -68,17 +68,7 @@ async def login(user: UserAuth):
 
     token = {'token': jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM), 'username': user_db['username']}
 
-    response = JSONResponse(content={'Message': 'Login Realizado com sucesso'})
-    response.set_cookie(
-        key='access_token',
-        value=f'Bearer {token["token"]}',
-        max_age=86400,
-        httponly=True,
-        secure=True,
-        samesite='lax',
-    )
-
-    return response
+    return JSONResponse(content={'Message': 'Login Realizado com sucesso', 'Token': token, 'expires_in': expires_in*3600})
 
 
 
