@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, HTTPException, Depends, status, File
+from fastapi import APIRouter, UploadFile, HTTPException, Depends, status, File, Form
 from fastapi.responses import JSONResponse, StreamingResponse
 from bson import ObjectId
 import gridfs
@@ -27,18 +27,27 @@ async def get_projects():
 
 # Post request to add a project
 @router.post("/projects", dependencies=[Depends(auth_wrapper)])
-async def add_project(project: Project = Depends(Project), file: UploadFile = File(...)):
+async def add_project(
+    name: str = Form(...),
+    short_description: str = Form(...),
+    long_description: str = Form(...),
+    file: UploadFile = File(...)
+    ):
+
     try:
         file_id = fs.put(file.file, filename=file.filename)
-        project.image_id = str(file_id)
+        project = Project(
+            name=name,
+            image_id=str(file_id),
+            short_description=short_description,
+            long_description=long_description
+        )
 
         project_dict = to_dict(project)
         collection_name.insert_one(project_dict)
 
         return JSONResponse(status_code=status.HTTP_201_CREATED, content={"message": "Project added successfully"})
-    
     except Exception as e:
-        
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/image/{file_id}")
