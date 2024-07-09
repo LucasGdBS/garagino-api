@@ -7,6 +7,7 @@ app = FastAPI(title="Garagino API", description="API do Garagino web app", versi
 
 origins = [
     "http://localhost:5173",
+    "https://garagino.up.railway.app",
 ]
 
 app.add_middleware(
