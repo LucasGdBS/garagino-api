@@ -6,7 +6,6 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, UTC
 import jwt
 from decouple import config
-from schema.schemas import to_dict
 
 router = APIRouter()
 
@@ -42,8 +41,6 @@ async def register(user: User):
 async def login(user: UserAuth):
     '''Metodo responsavel por autenticar um usuario'''
     user_db = collection_name.find_one({'username': user.username})
-    user_db = to_dict(user_db)
-    
 
     if user_db is None:
         raise HTTPException(
